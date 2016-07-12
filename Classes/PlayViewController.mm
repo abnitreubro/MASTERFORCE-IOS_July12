@@ -7,7 +7,7 @@
 //
 
 #import "PlayViewController.h"
-#include "IpCameraClientAppDelegate.h"
+#include "AppDelegate.h"
 
 #import "obj_common.h"
 #import "PPPPDefine.h"
@@ -20,9 +20,7 @@
 #import "avilib.h"
 #import <QuartzCore/QuartzCore.h>
 #import  <AVFoundation/AVFoundation.h>
-#import "UPlateViewController.h"
 #import "MySetDialog.h"
-#import "MyPlaySound.h"
 @implementation PlayViewController
 
 
@@ -78,6 +76,10 @@
 @synthesize btnStatusPrompt;
 
 @synthesize portraitView;
+
+@synthesize AudioURlP2P,VideoURLP2P;
+
+
 #pragma mark -
 #pragma mark others
 
@@ -101,6 +103,8 @@
     m_pPPPPChannelMgt->StopPPPPTalk([strDID UTF8String]);
 }
 
+
+
 - (IBAction)btnStop:(id)sender
 {
     if (isRecordStart) {
@@ -114,6 +118,8 @@
     bManualStop = YES;    
     [self StopPlay: 0]; 
 }
+
+
 
 - (IBAction)btnAudioControl:(id)sender
 {
@@ -136,8 +142,6 @@
 
 - (IBAction)btnTalkControl:(id)sender
 {
-    
-    
     
     if (m_bTalkStarted) {
         //[self StopTalk];
@@ -209,6 +213,10 @@
         
 }
 
+
+
+
+
 - (NSString*) GetRecordFileName
 {
     
@@ -217,13 +225,15 @@
     [formatter setDateFormat:@"yyyy-MM-dd_HH:mm:ss"];
     NSString* strDateTime = [formatter stringFromDate:date];
     
-    NSString *strFileName = [NSString stringWithFormat:@"%@_%@.rec",strDID , strDateTime];
+    NSString *strFileName = [NSString stringWithFormat:@"%@_%@.mov",strDID , strDateTime];
     
     [formatter release];
     
     return strFileName;
-
 }
+
+
+
 
 - (NSString*) GetRecordPath: (NSString*)strFileName
 {
@@ -242,13 +252,15 @@
     [fileManager createDirectoryAtPath:strPath withIntermediateDirectories:YES attributes:nil error:nil];
     
     
+    
     strPath = [strPath stringByAppendingPathComponent:strFileName];
     
         
     return strPath;
-    
-    
 }
+
+
+
 
 - (void) stopRecord
 {
@@ -257,6 +269,10 @@
     [RecNotifyDelegate NotifyReloadData];
     [m_RecordLock  unlock];
 }
+
+
+
+
 -(IBAction)btnRemoteRecord:(id)sender{
     if (isRecoding) {
         btnRemoteRecord.style = UIBarButtonItemStyleBordered;
@@ -277,50 +293,116 @@
         [btnGoStop setImage:[UIImage imageNamed:@"play_start.png"]];
     }
     isGo=!isGo;
-   
 }
+
+
+
 - (IBAction) btnRecord:(id)sender
 {
-   
+    
+    [self recordVideo:sender];
+//    
+//    [m_RecordLock lock];
+//    
+//    if (m_pCustomRecorder == NULL) {
+//        BOOL flag=[self isOutOfMemory];
+//        
+//        if (flag) {
+//            
+//            [CustomToast showWithText:NSLocalizedStringFromTable(@"runcar_outofmemory", @STR_LOCALIZED_FILE_NAME, nil)
+//                            superView:self.view
+//                            bLandScap:YES];
+//            [m_RecordLock unlock];
+//            return;
+//        }
+//        labelRecording.hidden=NO;
+//        m_pCustomRecorder = new CCustomAVRecorder();
+//        NSString *strFileName = [self GetRecordFileName];
+//        NSString *strPath = [self GetRecordPath: strFileName];
+//        
+//        if(m_pCustomRecorder->StartRecord((char*)[strPath UTF8String], m_videoFormat, (char*)[strDID UTF8String]))
+//        {
+//            NSDate* date = [NSDate date];    
+//            NSDateFormatter* formatter = [[NSDateFormatter alloc] init];    
+//            [formatter setDateFormat:@"yyyy-MM-dd"];
+//            NSString* strDate = [formatter stringFromDate:date];
+//            [m_pRecPathMgt InsertPath:strDID Date:strDate Path:strFileName];
+//            [formatter release];
+//        }
+//         timer=[NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(updateRecordTime) userInfo:nil repeats:YES];
+//        //打开锁
+//        //[self.btnSetContrast setEnabled:YES];
+//       
+//        btnRecord.style = UIBarButtonItemStyleDone;
+//        isRecordStart=YES;
+//    }else {
+//        //关闭锁
+//        timeNumber=0;
+//        isRecordStart=NO;
+//        labelRecording.hidden=YES;
+//        labelRecording.text=[NSString stringWithFormat:@"%@%@",NSLocalizedStringFromTable(@"play_recording", @STR_LOCALIZED_FILE_NAME, nil),@"00:00:00"];
+//        [timer invalidate];
+//        timer=nil;
+//        
+//        SAFE_DELETE(m_pCustomRecorder);
+//        [RecNotifyDelegate NotifyReloadData];
+//        btnRecord.style = UIBarButtonItemStyleBordered;
+//    }
+//    [m_RecordLock unlock];
+    
+}
 
+
+-(NSString *)getRecordTime:(int)secTime{
+    int hour = secTime / 60 / 60;
+    int minute = (secTime - hour * 3600 ) / 60;
+    int sec = (secTime - hour * 3600 - minute * 60) ;
+    NSString *strTime = [NSString stringWithFormat:@"%02d:%02d:%02d", hour, minute, sec];
+    return strTime;
+}
+
+
+
+-(void)updateRecordTime{
     
+    timeNumber++;
+    NSString *strTime=[self getRecordTime:timeNumber];
+    NSLog(@"%@",strTime);
+    labelRecording.text=[NSString stringWithFormat:@"%@%@",NSLocalizedStringFromTable(@"play_recording", @STR_LOCALIZED_FILE_NAME, nil),strTime];
+//    return;
+    btnUpdateTime.title=[NSString stringWithFormat:@"Recording...%d",timeNumber];
     
-    [m_RecordLock lock];
+    NSLog(@"startRecordTime  timeNumber=%d",timeNumber);
     
-    
-    
-    if (m_pCustomRecorder == NULL) {
-        BOOL flag=[self isOutOfMemory];
+    NSLog(@"set Time%ld",[[[NSUserDefaults standardUserDefaults] valueForKey:@"recordingTime"] integerValue]);
+    if (timeNumber==([[[NSUserDefaults standardUserDefaults] valueForKey:@"recordingTime"] integerValue])*60) {
+//        timeNumber=0;
+//        SAFE_DELETE(m_pCustomRecorder);
+//        [RecNotifyDelegate NotifyReloadData];
+//        BOOL flag=[self isOutOfMemory];
+//        
+//        if (flag) {
+//            
+//            [CustomToast showWithText:NSLocalizedStringFromTable(@"runcar_outofmemory", @STR_LOCALIZED_FILE_NAME, nil)
+//                            superView:self.view
+//                            bLandScap:YES];
+//            [m_RecordLock unlock];
+//            return;
+//        }
+//        labelRecording.hidden=NO;
+//        m_pCustomRecorder = new CCustomAVRecorder();
+//        NSString *strFileName = [self GetRecordFileName];
+//        NSString *strPath = [self GetRecordPath: strFileName];
+//        if(m_pCustomRecorder->StartRecord((char*)[strPath UTF8String], m_videoFormat, (char*)[strDID UTF8String]))
+//        {
+//            NSDate* date = [NSDate date];
+//            NSDateFormatter* formatter = [[NSDateFormatter alloc] init];
+//            [formatter setDateFormat:@"yyyy-MM-dd"];
+//            NSString* strDate = [formatter stringFromDate:date];
+//            [m_pRecPathMgt InsertPath:strDID Date:strDate Path:strFileName];
+//            [formatter release];
+//        }
         
-        if (flag) {
-            
-            [CustomToast showWithText:NSLocalizedStringFromTable(@"runcar_outofmemory", @STR_LOCALIZED_FILE_NAME, nil)
-                            superView:self.view
-                            bLandScap:YES];
-            [m_RecordLock unlock];
-            return;
-        }
-        labelRecording.hidden=NO;
-        m_pCustomRecorder = new CCustomAVRecorder();
-        NSString *strFileName = [self GetRecordFileName];
-        NSString *strPath = [self GetRecordPath: strFileName];
-        if(m_pCustomRecorder->StartRecord((char*)[strPath UTF8String], m_videoFormat, (char*)[strDID UTF8String]))
-        {
-            NSDate* date = [NSDate date];    
-            NSDateFormatter* formatter = [[NSDateFormatter alloc] init];    
-            [formatter setDateFormat:@"yyyy-MM-dd"];
-            NSString* strDate = [formatter stringFromDate:date];
-            [m_pRecPathMgt InsertPath:strDID Date:strDate Path:strFileName];
-            [formatter release];
-        }
-         timer=[NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(updateRecordTime) userInfo:nil repeats:YES];
-        //打开锁
-        //[self.btnSetContrast setEnabled:YES];
-       
-        btnRecord.style = UIBarButtonItemStyleDone;
-        isRecordStart=YES;
-    }else {
-        //关闭锁
         timeNumber=0;
         isRecordStart=NO;
         labelRecording.hidden=YES;
@@ -331,52 +413,7 @@
         SAFE_DELETE(m_pCustomRecorder);
         [RecNotifyDelegate NotifyReloadData];
         btnRecord.style = UIBarButtonItemStyleBordered;
-    }
-    [m_RecordLock unlock];
-    
-}
--(NSString *)getRecordTime:(int)secTime{
-    int hour = secTime / 60 / 60;
-    int minute = (secTime - hour * 3600 ) / 60;
-    int sec = (secTime - hour * 3600 - minute * 60) ;
-    NSString *strTime = [NSString stringWithFormat:@"%02d:%02d:%02d", hour, minute, sec];
-    return strTime;
-}
--(void)updateRecordTime{
-    
-    timeNumber++;
-    NSString *strTime=[self getRecordTime:timeNumber];
-    labelRecording.text=[NSString stringWithFormat:@"%@%@",NSLocalizedStringFromTable(@"play_recording", @STR_LOCALIZED_FILE_NAME, nil),strTime];
-    return;
-    btnUpdateTime.title=[NSString stringWithFormat:@"Recording...%d",timeNumber];
-    NSLog(@"startRecordTime  timeNumber=%d",timeNumber);
-    if (timeNumber==5) {
-        timeNumber=0;
-        SAFE_DELETE(m_pCustomRecorder);
-        [RecNotifyDelegate NotifyReloadData];
-        BOOL flag=[self isOutOfMemory];
-        
-        if (flag) {
-            
-            [CustomToast showWithText:NSLocalizedStringFromTable(@"runcar_outofmemory", @STR_LOCALIZED_FILE_NAME, nil)
-                            superView:self.view
-                            bLandScap:YES];
-            [m_RecordLock unlock];
-            return;
-        }
-        labelRecording.hidden=NO;
-        m_pCustomRecorder = new CCustomAVRecorder();
-        NSString *strFileName = [self GetRecordFileName];
-        NSString *strPath = [self GetRecordPath: strFileName];
-        if(m_pCustomRecorder->StartRecord((char*)[strPath UTF8String], m_videoFormat, (char*)[strDID UTF8String]))
-        {
-            NSDate* date = [NSDate date];
-            NSDateFormatter* formatter = [[NSDateFormatter alloc] init];
-            [formatter setDateFormat:@"yyyy-MM-dd"];
-            NSString* strDate = [formatter stringFromDate:date];
-            [m_pRecPathMgt InsertPath:strDID Date:strDate Path:strFileName];
-            [formatter release];
-        }
+        [m_RecordLock unlock];
     }
     
 //    if (timeNumber==5) {
@@ -791,7 +828,7 @@
     [UIView setAnimationDuration:0.4];
     
     //动画的内容        
-    CGRect frame = toolBarTop.frame; 
+    CGRect frame = headerView.frame;
     if (bShow == YES) {
         
             frame.origin.y += frame.size.height;
@@ -803,7 +840,7 @@
         
         
     }       
-    [toolBarTop setFrame:frame];
+    [headerView setFrame:frame];
     
     CGRect frame2 = playToolBar.frame;
     CGRect frame3 = timeoutLabel.frame;
@@ -852,7 +889,7 @@
     
        
     if (bForce==100) {//100表示进入U盘
-        IpCameraClientAppDelegate *IPCAMDelegate = [[UIApplication sharedApplication] delegate];
+        AppDelegate *IPCAMDelegate = [[UIApplication sharedApplication] delegate];
         [IPCAMDelegate switchBack:strDID User:strUser Pwd:strPwd Type:bForce];
     } 
     
@@ -925,11 +962,11 @@
     self.imageSnapshot = img;
     //UIDeviceOrientation deviceOrientation = [UIDevice currentDevice].orientation;
     if (!isLandScap) {
-        imgView.frame=CGRectMake(0, (mainScreenHeight-mainScreenWidth*3/4)/2, mainScreenWidth, mainScreenWidth*3/4);
+//        imgView.frame=CGRectMake(0, (mainScreenHeight-mainScreenWidth*3/4)/2, mainScreenWidth, mainScreenWidth*3/4);
     }else{
         NSLog(@" 横评。。。");
         NSLog(@"mainScreenWidth=%d mainScreenHeight*3/4=%d",mainScreenWidth,mainScreenHeight*3/4);
-        imgView.frame=CGRectMake((mainScreenHeight-mainScreenWidth*4/3)/2,0 , mainScreenWidth*4/3, mainScreenWidth);
+//        imgView.frame=CGRectMake((mainScreenHeight-mainScreenWidth*4/3)/2,0 , mainScreenWidth*4/3, mainScreenWidth);
     }
     imgView.image = img;
     [img release];
@@ -1210,69 +1247,30 @@
 -(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration{
    CGRect mainS=[[UIScreen mainScreen]bounds];
     NSLog(@"mainScreenWidth=%d mainScreenHeight=%d",mainScreenWidth,mainScreenHeight);
-    if (UIInterfaceOrientationIsPortrait
-        (toInterfaceOrientation)) {
-        imgView.frame=CGRectMake(0, (mainScreenHeight-mainScreenWidth*3/4)/2, mainScreenWidth, mainScreenWidth*3/4);
-        
-        if (myGLViewController!=nil) {
-            NSLog(@"myGLViewController");
-             myGLViewController.view.frame = CGRectMake(0, (mainScreenHeight-mainScreenWidth*3/4)/2, mainScreenWidth, mainScreenWidth*3/4);
-        }
-        isLandScap=NO;
-        NSLog(@"树屏。。width=%f height=%f",mainS.size.width,mainS.size.height);
-        
-        
-        
-        
-    }else{
-        
-        NSLog(@"横屏。。width=%f height=%f",mainS.size.width,mainS.size.height);
-        isLandScap=YES;
-        imgView.frame=CGRectMake((mainScreenHeight-mainScreenWidth*4/3)/2,0 , mainScreenWidth*4/3, mainScreenWidth);
-        if (myGLViewController!=nil) {
-            myGLViewController.view.frame =CGRectMake((mainScreenHeight-mainScreenWidth*4/3)/2,0 , mainScreenWidth*4/3, mainScreenWidth);
-        }
-    }
-}
-// Override to allow orientations other than the default portrait orientation.
-//- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-//    // Return YES for supported orientations.
-//    
-//   // NSLog(@"playviewcontroller shouldAutorotateToInterfaceOrientation");
-//    //UIInterfaceOrientationIsPortrait(interfaceOrientation);///
-//    return UIInterfaceOrientationIsLandscape(interfaceOrientation);
-//    //return YES;
-//}
-//-(NSUInteger)supportedInterfaceOrientations{
-//    
-//    return UIInterfaceOrientationMaskPortrait;  // 可以修改为任何方向
-//}
 
-//- (NSUInteger) supportedInterfaceOrientations{
-//    NSLog(@"playviewcontroller supportedInterfaceOrientations");
-//    return UIInterfaceOrientationMaskLandscape;
-//}
-//
-//- (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation{
-//    NSLog(@"playviewcontroller preferredInterfaceOrientationForPresentation");
-//    return (UIInterfaceOrientationLandscapeLeft | UIInterfaceOrientationLandscapeRight);
-//}
+}
+
+
 
 - (void) viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    
-//    float version = [[[UIDevice currentDevice] systemVersion] floatValue];
-//    if (version >= 6.0) {
-//        [self.view setTransform:CGAffineTransformMakeRotation(M_PI / 2)];
-// 
-//        CGRect rectScreen = [[UIScreen mainScreen] applicationFrame];
-// 
-//        self.view.frame = rectScreen;//CGRectMake(0,0,480,320);
-//    }
+    [self.navigationController setNavigationBarHidden:YES];
 
-    
+    if (deviceStatus!=PPPP_STATUS_ON_LINE) {
+        NSLog(@"btnStartPPPP.....connecting...");
+        m_pPPPPChannelMgt->pCameraViewController = self;
+        m_pPPPPChannelMgt->Start([strDID UTF8String], [strUser UTF8String], [strPwd UTF8String]);
+        [self hiddenProgresssLabel:NO];
+        imgView.image = nil;
+    }
 }
+
+
+
+
+
+
 - (void) viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -1285,26 +1283,71 @@
                                                object:nil];
     
 }
+
+
+
+
+
 - (void) viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
-    [[NSNotificationCenter defaultCenter]removeObserver:self name:UIApplicationDidEnterBackgroundNotification object:nil];
+    [self.navigationController setNavigationBarHidden:NO];
+    
+    if (deviceStatus != PPPP_STATUS_ON_LINE)
+        [self StopPlay:1];
+    else
+    {
+        if (isRecording) {
+            [self recordVideo:nil];
 
-}
-- (void)EnterBackground{
-    if (isLandScap) {
-            [IpCameraClientAppDelegate setEnterBackground:YES];
+        }
+        if (isRecording || isProcessing)
+        {
+            tempDetailsArray = [[NSMutableArray alloc] initWithObjects:@"Started",audioOrVideo,@"p2p", nil];
+            [[NSUserDefaults standardUserDefaults] setValue:tempDetailsArray forKey:@"recording"];
+        }
     }
+
+    [[NSNotificationCenter defaultCenter]removeObserver:self name:UIApplicationDidEnterBackgroundNotification object:nil];
 }
+
+
+
+
+
+- (void)EnterBackground{
+    if (isLandScap)
+        [AppDelegate setEnterBackground:YES];
+    
+//    [self recordVideo:nil];
+    
+//    if (isRecording || isProcessing)
+//    {
+//        tempDetailsArray = [[NSMutableArray alloc] initWithObjects:@"Started",audioOrVideo,@"p2p", nil];
+//        [[NSUserDefaults standardUserDefaults] setValue:tempDetailsArray forKey:@"recording"];
+//    }
+    
+    
+    [self.navigationController popViewControllerAnimated:NO];
+}
+
+
+
+
 - (void)EnterForeground{
     NSLog(@"EnterForeground");
-
-    
+//    if (deviceStatus!=PPPP_STATUS_ON_LINE) {
+//        NSLog(@"btnStartPPPP.....connecting...");
+//        m_pPPPPChannelMgt->pCameraViewController = self;
+//        m_pPPPPChannelMgt->Start([strDID UTF8String], [strUser UTF8String], [strPwd UTF8String]);
+//        [self hiddenProgresssLabel:NO];
+//    }
 }
+
+
+
+
 - (void)didReceiveMemoryWarning {
-    // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
-    
-    // Release any cached data, images, etc. that aren't in use.
 }
 
 - (void) updateContrast: (id) sender
@@ -1409,7 +1452,7 @@
     imgViewFrame.origin.y = nDisplayY;
     imgViewFrame.size.width = nDisplayWidth;
     imgViewFrame.size.height = nDisplayHeight;
-    imgView.frame = imgViewFrame;
+//    imgView.frame = imgViewFrame;
     
     //----for yuv------
     //CGRect GLViewRect ;
@@ -1498,13 +1541,16 @@
 }
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {
+    
+    [self.navigationController setNavigationBarHidden:YES];
+    
     [super viewDidLoad];
     self.view.autoresizesSubviews=YES;
    takepicNum=0;
     CGRect mainScreen=[[UIScreen mainScreen]bounds];
     mainScreenWidth=mainScreen.size.width;
     mainScreenHeight=mainScreen.size.height;
-    if ([IpCameraClientAppDelegate getEnterBackground]==YES) {
+    if ([AppDelegate getEnterBackground]==YES) {
         if ([[UIDevice currentDevice] userInterfaceIdiom ]==UIUserInterfaceIdiomPhone) {
             if (mainScreenWidth<mainScreenHeight) {
                 mainScreenWidth=mainScreen.size.width;
@@ -1520,7 +1566,7 @@
             mainScreenHeight=mainScreen.size.width;
         }
         
-        [IpCameraClientAppDelegate setEnterBackground:NO];
+        [AppDelegate setEnterBackground:NO];
     }
     isLandScap=NO;
     
@@ -1531,7 +1577,7 @@
     isStop=NO;
     labelRecording.text=[NSString stringWithFormat:@"%@%@",NSLocalizedStringFromTable(@"play_recording", @STR_LOCALIZED_FILE_NAME, nil),@"00:00:00"];
     setDialog=[[MySetDialog alloc]initWithFrame:CGRectMake(-100, 50, 100, 100) Btn:2];
-    [self.view addSubview:setDialog];
+   // [self.view addSubview:setDialog];
     setDialog.diaDelegate=self;
     setDialog.backgroundColor=[UIColor colorWithRed:0.5 green:0.5 blue:0.5 alpha:0.8];
     [setDialog setBtnTitle:@"QVGA" Index:0];
@@ -1623,7 +1669,7 @@
     [imgView addGestureRecognizer:tapGes1];
     [tapGes1 release];
     
-    
+    imgView.contentMode = UIViewContentModeScaleAspectFit;
     [self.view addSubview:imageBg];
     [self.view sendSubviewToBack:imageBg];    
     [imageBg release];    
@@ -1683,9 +1729,7 @@
     
     self.btnTitle.title = cameraName;
     
-    toolBarTop.tintColor = [UIColor colorWithRed:COLOR_BASE_RED/255.0f green:COLOR_BASE_GREEN/255.0f blue:COLOR_BASE_BLUE/255.0f alpha:1.0f];
-    playToolBar.tintColor = [UIColor colorWithRed:COLOR_BASE_RED/255.0f green:COLOR_BASE_GREEN/255.0f blue:COLOR_BASE_BLUE/255.0f alpha:1.0f];
- 
+
     if ([[[UIDevice currentDevice] systemVersion] floatValue] > 4.9) {
         
         //iOS 5
@@ -1704,10 +1748,6 @@
         [playToolBar insertSubview:[[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"barbk.png"]] autorelease] atIndex:0]; 
     }     
     
-//    UITapGestureRecognizer *tapGes=[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(playViewTouch:)];
-//    [tapGes setNumberOfTapsRequired:1];
-//    [self.imgView addGestureRecognizer:tapGes];
-//    [tapGes release];
     
     UIColor *osdColor = [UIColor colorWithRed:255/255.0f green:255/255.0f blue:255/255.0f alpha:0.3f];
     
@@ -1761,19 +1801,9 @@
     [self.progressView setHidden:NO];
     [self.progressView startAnimating];
     
-//    if ([IpCameraClientAppDelegate isIOS7Version]) {
-//        self.wantsFullScreenLayout = YES;
-//        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
-//        
         CGRect topFrame=toolBarTop.frame;
-//        topFrame.origin.y+=20;
         topFrame.size.width=mainScreenHeight;
         toolBarTop.frame=topFrame;
-//        isIOS7=YES;
-//    }else{
-//        isIOS7=NO;
-//    }
-    
     
    
     //连接设备
@@ -1789,6 +1819,10 @@
     [self isOutOfMemory];
     [NSThread detachNewThreadSelector:@selector(switchActionlocal) toTarget:self withObject:nil];
 }
+
+
+
+
 - (void)switchActionlocal{
     //设置时间
     NSTimeZone *zone = [NSTimeZone localTimeZone];//获得当前应用程序默认的时区
@@ -1804,10 +1838,8 @@
     m_pPPPPChannelMgt->CameraControl([strDID UTF8String], 40, 40);
 }
 - (void)viewDidUnload {
+    
     [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    //NSLog(@"PlayViewController ViewDidUnload"); 
-
 }
 
 - (void)dealloc {
@@ -1943,25 +1975,15 @@
         }
 }
     
-    
-    
-    
-    
-    //如果是PPP断开，则停止播放
-//    if (statusType == MSG_NOTIFY_TYPE_PPPP_STATUS && status == PPPP_STATUS_DISCONNECT) {
-//        
-//        NSLog(@"");
-//        isDataComeback=NO;
-//        [mytoast showWithText:NSLocalizedStringFromTable(@"PPPPStatusDisconnected", @STR_LOCALIZED_FILE_NAME, nil)];
-//        [self performSelectorOnMainThread:@selector(StopPlay:) withObject:nil waitUntilDone:NO];
-//    }    
-    
 }
 
 - (void) StopPPPPByDID:(NSString*)did
 {
     m_pPPPPChannelMgt->Stop([did UTF8String]);
 }
+
+
+
 - (IBAction) btnStartPPPP:(id)sender{
     if (deviceStatus!=PPPP_STATUS_ON_LINE) {
         NSLog(@"btnStartPPPP.....connecting...");
@@ -1969,39 +1991,57 @@
          m_pPPPPChannelMgt->Start([strDID UTF8String], [strUser UTF8String], [strPwd UTF8String]);
         [self hiddenProgresssLabel:NO];
     }
-    
 }
+
+
+
+
 -(void)updateDeviceStatus:(NSString*)strStatus{
     if (deviceStatus!=PPPP_STATUS_CONNECTING) {
         [self hiddenProgresssLabel:YES];
     }
+    if (deviceStatus==PPPP_STATUS_CONNECTING) {
+        self.LblProgress.text = NSLocalizedStringFromTable(@"Connecting", @STR_LOCALIZED_FILE_NAME,nil);
+        self.LblProgress.hidden = NO;
+        [self.progressView setHidden:NO];
+        [self.progressView startAnimating];
+    }
+
+    if (deviceStatus==PPPP_STATUS_CONNECT_TIMEOUT)
+    {
+        [self timeOutAlertMessagePopOut];
+    }
+    
     [btnStatusPrompt setTitle:strStatus];
 }
+
+
+
+
 -(void)hiddenProgresssLabel:(BOOL)bShow{
     [self.progressView setHidden:bShow];
     [self.LblProgress setHidden:bShow];
 }
+
+
+
 -(void)getLivestream{
     NSLog(@"PlayViewController...getLivestream...============");
     if (m_pPPPPChannelMgt != NULL) {
-        //如果请求视频失败，则退出播放
+
         [self hiddenProgresssLabel:NO];
         self.LblProgress.text=NSLocalizedStringFromTable(@"play_getvideo", @STR_LOCALIZED_FILE_NAME, nil);
+        
         if( m_pPPPPChannelMgt->StartPPPPLivestream([strDID UTF8String], 10, self) == 0 ){
             NSLog(@"获取视频失败...");
             [self updateDeviceStatus:NSLocalizedStringFromTable(@"play_getvideofailed", @STR_LOCALIZED_FILE_NAME, nil)];
-//            
-//            [CustomToast showWithText:NSLocalizedStringFromTable(@"play_getvideofailed", @STR_LOCALIZED_FILE_NAME, nil)
-//                            superView:self.view
-//                            bLandScap:YES];
-           // [self performSelectorOnMainThread:@selector(StopPlay:) withObject:nil waitUntilDone:NO];
+
             return;
         }
         
         
         m_pPPPPChannelMgt->SetRunCarDelegate((char *)[strDID UTF8String], self);
         m_pPPPPChannelMgt->PPPPSetSystemParams((char *)[strDID UTF8String], MSG_TYPE_GET_STATUS, NULL, 0);
-        //[self getCameraParams];
     }
 }
 -(void)onMainThread{
@@ -2057,7 +2097,7 @@
 -(void)stopRecordForMemoryOver{
     
     
-    if (isRecoding) {
+    if (isRecoding||isRecording) {
         recordNum=0;
         btnUpdateTime.title=@"Recording...0";
         btnRecord.style = UIBarButtonItemStyleBordered;
@@ -2065,22 +2105,11 @@
         [timer invalidate];
         timer=nil;
         timeNumber=0;
-        SAFE_DELETE(m_pCustomRecorder);
+      //  SAFE_DELETE(m_pCustomRecorder);
+        [self recordVideo:nil];  // new
+
     }
-   
-//    [RecNotifyDelegate NotifyReloadData];
-    
-//    [aviRecorder stopRecord];
-//    [aviRecorder release];
-//    aviRecorder=nil;
-//    [timer invalidate];
-    
-    //关闭锁
-//    [self.btnItemResolution setEnabled:YES];
-//    [self.btnSetContrast setEnabled:NO];
-    
-    
-    //[RecNotifyDelegate NotifyReloadData];
+
     
     [CustomToast showWithText:NSLocalizedStringFromTable(@"runcar_outofmemory", @STR_LOCALIZED_FILE_NAME, nil)
                     superView:self.view
@@ -2144,7 +2173,7 @@
     if(isStop){
         return;
     }
-    if ([IpCameraClientAppDelegate is43Version]) {//4.3.3版本
+    if ([AppDelegate is43Version]) {//4.3.3版本
         
         UIImage *image=[APICommon YUV420ToImage:yuv width:width height:height];
         if (bPlaying==NO) {
@@ -2368,4 +2397,782 @@
     
     btnMemory.title=memory;
 }
+
+
+
+
+
+
+//////////////////////////______________________________________________////////////////////////
+//////////////////////////______________________________________________////////////////////////
+//////////////////////////______________________________________________////////////////////////
+//////////////////////////______________________________________________////////////////////////
+//////////////////////////______________________________________________////////////////////////
+//////////////////////////______________________________________________////////////////////////
+//////////////////////////______________________________________________////////////////////////
+
+
+
+#pragma mark- New Methods to capture video
+# pragma mark
+#pragma mark
+#pragma mark
+
+
+
+- (IBAction)backButtonAction:(id)sender {
+    
+    [self.navigationController popViewControllerAnimated:YES];
+    
+    
+}
+
+
+
+// Button Action to record video for curent event from live streaming
+
+-(void)recordVideo :(id)sender{
+    
+    BOOL flag=[self isOutOfMemory];
+    
+    if (flag) {
+        
+        [CustomToast showWithText:@"No enough storage. Please clean up and try again."
+                        superView:self.view
+                        bLandScap:NO];
+        
+        
+        return;
+    }
+    
+    if (isProcessing && !isRecording) {
+        return;
+    }
+    if (isRecording) {
+        [recorder stop];
+        AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+        [audioSession setActive:NO error:nil];
+        [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
+        
+        recorder=nil;
+        
+        isRecording=NO;
+        startedAt=nil;
+
+        [recordingTimerVideo invalidate];
+        recordingTimerVideo=nil;
+        
+        NSLog(@"numberOfScreenshots is %@",numberOfScreenshots);
+        
+        isRecording=NO;
+        
+        isProcessing=YES;
+        
+        if(numberOfScreenshots.count > 0)
+        {
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                
+                labelRecording.text = @"Saving...";
+            }];
+            [NSThread detachNewThreadSelector:@selector(createWriter) toTarget:self withObject:nil];
+
+        }
+
+        [recordingTimer invalidate];
+        recordingTimer=nil;
+        [autometicStopTimer invalidate];
+        autometicStopTimer=nil;
+        self.labelRecording.hidden=YES;
+        // Working For Audio Recording For Merging with Video
+        
+        
+    }
+    else{
+
+        
+        if ([[btnStatusPrompt title] isEqualToString:NSLocalizedStringFromTable(@"PPPPStatusOnline", @STR_LOCALIZED_FILE_NAME, nil)])
+        {
+            startedAt = [NSDate date];
+            
+            isRecording=YES;
+            
+            NSLog(@"Audio Recording status is %@",[[NSUserDefaults standardUserDefaults]objectForKey:@"isRecordAudio"]);
+            
+            if ([[[NSUserDefaults standardUserDefaults]objectForKey:@"isRecordAudio"]integerValue]==1) {
+                [self initializeAudioRecorder];
+                AVAudioSession *session = [AVAudioSession sharedInstance];
+                [session setActive:YES error:nil];
+                
+                audioOrVideo = @"Audio";
+                // Start recording
+                [recorder record];
+                
+            }
+            else
+                audioOrVideo = @"Video";
+            
+            currentTimeInSeconds = 0;
+            
+            self.labelRecording.text = [self formattedTime:currentTimeInSeconds];
+            self.labelRecording.hidden=NO;
+            // [screenCaptureView startRecording];
+            
+            // Working For Audio Recording For Merging with Video
+            
+            numberOfScreenshots=[[NSMutableArray alloc]init];
+            
+            recordingTimerVideo =[NSTimer scheduledTimerWithTimeInterval:0.25
+                                                                  target:self
+                                                                selector:@selector(timerMethodExecute:)
+                                                                userInfo:nil
+                                                                 repeats:YES];
+            
+            
+            
+            
+            if (!currentTimeInSeconds) {
+                currentTimeInSeconds = 0 ;
+            }
+            
+            if (!recordingTimer) {
+                recordingTimer = [self createTimer:1.0:YES];
+            }
+            
+            if (!autometicStopTimer) {
+                
+                autometicStopTimer=[self createTimer:[[[NSUserDefaults standardUserDefaults]objectForKey:@"recordingTime"]floatValue]*60:NO];
+            }
+            
+            
+
+        }
+        else
+        {
+            [CustomToast showWithText:btnStatusPrompt.title
+                            superView:self.view
+                            bLandScap:NO];
+        }
+    }
+}
+
+#pragma mark- Screen Capture Functionality
+
+-(void)timerMethodExecute:(id)info{
+    
+    if ([self isOutOfMemory]) {
+        
+        [self stopRecordForMemoryOver];
+        
+        return;
+    }
+    [self takeScreenshots];
+}
+
+
+-(void)takeScreenshots{
+    
+    
+    if ([[UIScreen mainScreen] respondsToSelector:@selector(scale)]){
+        
+        
+        NSData *tempData = UIImageJPEGRepresentation(self.imgView.image, 0.01);
+        
+        UIImage *image = [UIImage imageWithData:tempData];
+        
+        [numberOfScreenshots addObject:image];
+        
+    }
+    else{
+        
+        UIGraphicsBeginImageContext(self.imgView.bounds.size);
+        
+        UIGraphicsBeginImageContextWithOptions(self.imgView.bounds.size,self.imgView.opaque, 0.0);
+        [self.imgView.layer renderInContext:UIGraphicsGetCurrentContext()];
+        UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+        [numberOfScreenshots addObject:image];
+        
+    }
+    return;
+    
+    
+}
+
+
+#pragma end
+
+#pragma mark- Generating Video From Screenshots
+
+-(void)createWriter{
+    
+    NSError*error=nil;
+    
+    NSString *savedImagePath;
+    if ([[[NSUserDefaults standardUserDefaults]objectForKey:@"isRecordAudio"]integerValue]==1) {
+
+        NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+        [formatter setDateFormat: @"yyyyMMddHHmmss"];
+        NSString *strDate = [formatter stringFromDate:[NSDate date]]; // Convert date to string
+        
+        
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0]; // Get documents folder
+        NSString *dataPath = [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"/%@",@""]];
+        
+        
+        
+        if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])//Check
+            [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Will Create folder
+        
+        savedImagePath = [dataPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.mov",strDate]];
+        
+        
+        
+    }
+    else
+    {
+        NSString *strFileName = [self GetRecordFileName];
+        savedImagePath = [self GetRecordPath: strFileName];
+      
+        NSDate * date = [NSDate date];
+        NSDateFormatter * formatter = [[NSDateFormatter alloc] init];
+        [formatter setDateFormat:@"yyyy-MM-dd"];
+        NSString * strDate = [formatter stringFromDate:date];
+        
+        [m_pRecPathMgt InsertPath:strDID Date:strDate Path:strFileName];
+
+        p2pPathDetails = [[NSMutableArray alloc] initWithObjects:strDID,strDate,strFileName, nil];
+        
+        [[NSUserDefaults standardUserDefaults] setValue:p2pPathDetails forKey:@"p2pDetails"];
+        
+    }
+    
+   
+    
+    
+    
+    NSURL *videoTempURL = [NSURL fileURLWithPath:savedImagePath];
+    
+    
+    VideoURLP2P=[NSURL fileURLWithPath:savedImagePath];
+    
+    [[NSUserDefaults standardUserDefaults] setObject:savedImagePath forKey:@"video"];
+    
+    // WARNING: AVAssetWriter does not overwrite files for us, so remove the destination file if it already exists
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    [fileManager removeItemAtPath:[videoTempURL path]  error:NULL];
+    
+    int height = 480;
+    
+    int width = 640;
+    
+    
+    [self writeImageAsMovie:numberOfScreenshots toPath:savedImagePath size:CGSizeMake(width, height)];
+    numberOfScreenshots=nil;
+}
+
+-(void)writeImageAsMovie:(NSArray *)array toPath:(NSString*)path size:(CGSize)size
+
+{
+    NSError *error = nil;
+    
+    AVAssetWriter *videoWriter = [[AVAssetWriter alloc] initWithURL:[NSURL fileURLWithPath:path]
+                                  
+                                                           fileType:AVFileTypeQuickTimeMovie
+                                  
+                                                              error:&error];
+    
+    NSParameterAssert(videoWriter);
+    
+    NSDictionary *videoSettings = [NSDictionary dictionaryWithObjectsAndKeys:
+                                   
+                                   AVVideoCodecH264, AVVideoCodecKey,
+                                   
+                                   [NSNumber numberWithInt:size.width], AVVideoWidthKey,
+                                   
+                                   [NSNumber numberWithInt:size.height], AVVideoHeightKey,
+                                   
+                                   nil];
+    
+    
+    AVAssetWriterInput* writerInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo
+                                       
+                                                                         outputSettings:videoSettings];
+    
+    
+    
+    AVAssetWriterInputPixelBufferAdaptor *adaptor = [AVAssetWriterInputPixelBufferAdaptor assetWriterInputPixelBufferAdaptorWithAssetWriterInput:writerInput sourcePixelBufferAttributes:nil];
+    
+    
+    NSParameterAssert(writerInput);
+    
+    NSParameterAssert([videoWriter canAddInput:writerInput]);
+    
+    [videoWriter addInput:writerInput];
+    
+    //Start a SESSION of writing.
+    
+    // After you start a session, you will keep adding image frames
+    
+    // until you are complete - then you will tell it you are done.
+    
+    [videoWriter startWriting];
+    
+    // This starts your video at time = 0
+    
+    [videoWriter startSessionAtSourceTime:kCMTimeZero];
+    
+    
+    CVPixelBufferRef buffer = NULL;
+    
+    
+    // This was just our utility class to get screen sizes etc.
+    
+    
+    int i = 0;
+    _timeOfFirstFrame = CFAbsoluteTimeGetCurrent();
+
+    
+    while (1)
+        
+    {
+        
+        // Check if the writer is ready for more data, if not, just wait
+        
+        if(writerInput.readyForMoreMediaData){
+            
+            
+            CFAbsoluteTime current  = CFAbsoluteTimeGetCurrent();
+            CFTimeInterval elapse   = current - _timeOfFirstFrame;
+            CMTime present          = CMTimeMake( i * 150, 600);
+            
+            NSLog(@"%d",present);
+            
+            
+            if (i >= [array count])
+                
+            {
+                buffer = NULL;
+            }
+            
+            else
+                
+            {
+                // This command grabs the next UIImage and converts it to a CGImage
+                buffer = [self pixelBufferFromCGImage:[[array objectAtIndex:i] CGImage]];
+            }
+            
+            if (buffer)
+                
+            {
+                // Give the CGImage to the AVAssetWriter to add to your video
+                [adaptor appendPixelBuffer:buffer withPresentationTime:present];
+                
+                CVPixelBufferPoolRef bufferPool = adaptor.pixelBufferPool;
+                NSParameterAssert(bufferPool != NULL);
+                CVPixelBufferRelease(buffer);
+                i++;
+            }
+            
+            else
+                
+            {
+                //Finish the session:
+                // This is important to be done exactly in this order
+                [writerInput markAsFinished];
+                
+                // WARNING: finishWriting in the solution above is deprecated.
+                
+                // You now need to give a completion handler.
+                
+                [videoWriter finishWritingWithCompletionHandler:^{
+                    
+                    NSLog(@"Finished writing...checking completion status...");
+                    
+                    if (videoWriter.status != AVAssetWriterStatusFailed && videoWriter.status == AVAssetWriterStatusCompleted)
+                    {
+                        isProcessing=NO;
+                        NSLog(@"Video writing succeeded.");
+                        // Move video to camera roll
+                        
+                        // NOTE: You cannot write directly to the camera roll.
+                        
+                        // You must first write to an iOS directory then move it!
+                        
+                        //    NSURL *videoTempURL = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@", path]];
+                        
+                        if ([[[NSUserDefaults standardUserDefaults]objectForKey:@"isRecordAudio"]integerValue]==1)
+                        {
+                            [self mergeAndSave];
+                        }
+                        else{
+                            [self performSelectorOnMainThread:@selector(showVideoSuccessMessage) withObject:nil waitUntilDone:NO];
+                        }
+                    } else
+                        
+                    {
+                        NSLog(@"Video writing failed: %@", videoWriter.error);
+                    }
+                    
+                }]; // end videoWriter finishWriting Block
+                
+                CVPixelBufferPoolRelease(adaptor.pixelBufferPool);
+                
+                NSLog (@"Done");
+                
+                adaptor=nil;
+                videoWriter=nil;
+                writerInput=nil;
+                array=nil;
+                buffer=NULL;
+                
+                break;
+                
+            }
+        }
+    }
+}
+
+
+-(void)showVideoSuccessMessage{
+    
+    tempDetailsArray = [[NSMutableArray alloc] initWithObjects:@"Success",audioOrVideo,@"p2p", nil];
+    [[NSUserDefaults standardUserDefaults] setValue:tempDetailsArray forKey:@"recording"];
+    
+    
+    
+    NSLog(@"%@", self.navigationController.viewControllers);
+    if ([self.navigationController.viewControllers containsObject:self]) {
+        
+        [CustomToast showWithText:@"Video saved successfully"
+                        superView:self.view
+                        bLandScap:NO];
+    }
+}
+
+-(CVPixelBufferRef) pixelBufferFromCGImage: (CGImageRef) image
+
+{
+    // This again was just our utility class for the height & width of the
+    // incoming video (640 height x 480 width)
+    
+    int height = 1080;
+    int width = 720;
+    
+    NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
+                             
+                             [NSNumber numberWithBool:YES], kCVPixelBufferCGImageCompatibilityKey,
+                             
+                             [NSNumber numberWithBool:YES], kCVPixelBufferCGBitmapContextCompatibilityKey,
+                             
+                             nil];
+    
+    CVPixelBufferRef pxbuffer = NULL;
+    
+    CVReturn status = CVPixelBufferCreate(kCFAllocatorDefault, width,
+                                          
+                                          height, kCVPixelFormatType_32ARGB, (__bridge CFDictionaryRef) options,
+                                          
+                                          &pxbuffer);
+    
+    
+    
+    NSParameterAssert(status == kCVReturnSuccess && pxbuffer != NULL);
+    
+    CVPixelBufferLockBaseAddress(pxbuffer, 0);
+    
+    void *pxdata = CVPixelBufferGetBaseAddress(pxbuffer);
+    
+    NSParameterAssert(pxdata != NULL);
+    
+    CGColorSpaceRef rgbColorSpace = CGColorSpaceCreateDeviceRGB();
+    
+    CGContextRef context = CGBitmapContextCreate(pxdata, width,
+                                                 
+                                                 height, 8, 4*width, rgbColorSpace,
+                                                 
+                                                 kCGImageAlphaNoneSkipFirst);
+    
+    NSParameterAssert(context);
+    
+    CGContextConcatCTM(context, CGAffineTransformMakeRotation(0));
+    
+    CGContextDrawImage(context, CGRectMake(0, 0, width,
+                                           
+                                           height), image);
+    
+    CGColorSpaceRelease(rgbColorSpace);
+    
+    CGContextRelease(context);
+    
+    CVPixelBufferUnlockBaseAddress(pxbuffer, 0);
+    
+    return pxbuffer;
+}
+
+
+
+#pragma mark- end
+
+#pragma mark- Audio Capture Functionality
+
+
+-(void)initializeAudioRecorder{
+    
+    NSError*error=nil;
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat: @"yyyyMMddHHmmss"];
+    NSString *strDate = [formatter stringFromDate:[NSDate date]]; // Convert date to string
+    
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0]; // Get documents folder
+    NSString *dataPath = [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"/%@",@""]];
+    
+    
+    if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])//Check
+    {
+        [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Will Create folder
+    }
+    
+    NSString *savedImagePath = [dataPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.m4a",strDate]];
+
+    
+    [[NSUserDefaults standardUserDefaults] setObject:savedImagePath forKey:@"audio"];
+    
+    NSURL *outputFileURL = [NSURL fileURLWithPath:savedImagePath];
+    AudioURlP2P=[NSURL fileURLWithPath:savedImagePath];
+    
+    NSLog(@"Audio Path is %@",AudioURlP2P);
+    
+    // Setup audio session
+    AVAudioSession *session = [AVAudioSession sharedInstance];
+    [session setCategory:AVAudioSessionCategoryRecord error:&error];
+    
+    if (error) {
+        NSLog(@"Erro! %@", error.debugDescription);
+    }
+    
+    // Define the recorder setting
+    NSMutableDictionary *recordSetting = [[NSMutableDictionary alloc] init];
+    
+    [recordSetting setValue:[NSNumber numberWithInt:kAudioFormatMPEG4AAC] forKey:AVFormatIDKey];
+    [recordSetting setValue:[NSNumber numberWithFloat:44100.0] forKey:AVSampleRateKey];
+    [recordSetting setValue:[NSNumber numberWithInt: 2] forKey:AVNumberOfChannelsKey];
+    
+    // Initiate and prepare the recorder
+    recorder = [[AVAudioRecorder alloc] initWithURL:outputFileURL settings:recordSetting error:NULL];
+    recorder.delegate = self;
+    recorder.meteringEnabled = YES;
+    [recorder prepareToRecord];
+}
+
+- (void) audioRecorderDidFinishRecording:(AVAudioRecorder *)avrecorder successfully:(BOOL)flag{
+    
+    
+}
+
+#pragma mark- end
+
+
+#pragma mark- Mixing Audio and Video
+
+
+-(void)mergeAndSave
+{
+    //Create AVMutableComposition Object which will hold our multiple AVMutableCompositionTrack or we can say it will hold our video and audio files.
+    AVMutableComposition* mixComposition = [AVMutableComposition composition];
+    
+    //Now first load your audio file using AVURLAsset. Make sure you give the correct path of your videos.
+    //  NSURL *audio_url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"Asteroid_Sound" ofType:@"mp3"]];
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    // [fileManager removeItemAtPath:[AudioURl path]  error:NULL];
+    
+    NSLog(@"savedImagePathTemp is %@",[[NSUserDefaults standardUserDefaults] valueForKey:@"audio"]);
+
+    AudioURlP2P=[NSURL fileURLWithPath:[[NSUserDefaults standardUserDefaults] valueForKey:@"audio"]];
+    
+    NSLog(@"AudioURlP2P is %@",AudioURlP2P);
+
+    AVURLAsset  *audioAsset = [[AVURLAsset alloc]initWithURL:AudioURlP2P options:nil];
+    CMTimeRange audio_timeRange = CMTimeRangeMake(kCMTimeZero, audioAsset.duration);
+    
+    //Now we are creating the first AVMutableCompositionTrack containing our audio and add it to our AVMutableComposition object.
+    AVMutableCompositionTrack *b_compositionAudioTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
+    
+    if([[audioAsset tracksWithMediaType:AVMediaTypeAudio] firstObject]==NULL)
+    {
+        NSLog(@"Sound is not Present");
+    }
+    else
+    {
+        NSLog(@"Sound is Present");
+        //You will initalise all things
+    }
+
+    
+    [b_compositionAudioTrack insertTimeRange:audio_timeRange ofTrack:[[audioAsset tracksWithMediaType:AVMediaTypeAudio] objectAtIndex:0] atTime:kCMTimeZero error:nil];
+    
+    //Now we will load video file.
+    // NSURL *video_url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"Asteroid_Video" ofType:@"m4v"]];
+    
+    VideoURLP2P=[NSURL fileURLWithPath:[[NSUserDefaults standardUserDefaults] valueForKey:@"video"]];
+
+    
+    AVURLAsset  *videoAsset = [[AVURLAsset alloc]initWithURL:VideoURLP2P options:nil];
+    CMTimeRange video_timeRange = CMTimeRangeMake(kCMTimeZero,videoAsset.duration);
+    
+    //Now we are creating the second AVMutableCompositionTrack containing our video and add it to our AVMutableComposition object.
+    AVMutableCompositionTrack *a_compositionVideoTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
+    [a_compositionVideoTrack insertTimeRange:video_timeRange ofTrack:[[videoAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0] atTime:kCMTimeZero error:nil];
+    
+    
+    NSError*error=nil;
+    
+    
+    CMTime audioDuration = audioAsset.duration;
+    float audioDurationSeconds = CMTimeGetSeconds(audioDuration);
+
+    CMTime vdioDuration = videoAsset.duration;
+    float vdioDurationSeconds = CMTimeGetSeconds(vdioDuration);
+
+    
+    NSLog(@"audio time: %f, video time: %f",audioDurationSeconds,vdioDurationSeconds);
+    
+    NSString *strFileName = [self GetRecordFileName];
+    NSString *strPath = [self GetRecordPath: strFileName];
+    
+    NSURL *outputFileUrl = [NSURL fileURLWithPath:strPath];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:strPath])
+        [[NSFileManager defaultManager] removeItemAtPath:strPath error:nil];
+    
+    
+    
+    //Now create an AVAssetExportSession object that will save your final video at specified path.
+    AVAssetExportSession* _assetExport = [[AVAssetExportSession alloc] initWithAsset:mixComposition presetName:AVAssetExportPresetHighestQuality];
+    _assetExport.outputFileType = @"com.apple.quicktime-movie";
+    _assetExport.outputURL = outputFileUrl;
+    
+    [_assetExport exportAsynchronouslyWithCompletionHandler:
+     ^(void ) {
+         
+         dispatch_async(dispatch_get_main_queue(), ^{
+             
+             // [self exportDidFinish:_assetExport];
+            NSDate * date = [NSDate date];
+            NSDateFormatter * formatter = [[NSDateFormatter alloc] init];
+            [formatter setDateFormat:@"yyyy-MM-dd"];
+            NSString * strDate = [formatter stringFromDate:date];
+
+             [m_pRecPathMgt InsertPath:strDID Date:strDate Path:strFileName];
+             
+             NSLog(@"File merged sucessfully");
+             if ([fileManager fileExistsAtPath:[AudioURlP2P path]]) {
+                 
+                 NSFileManager *fileManager = [NSFileManager defaultManager];
+                 [fileManager removeItemAtPath:[AudioURlP2P path]  error:NULL];
+                 
+             }
+             
+             if ([fileManager fileExistsAtPath:[AudioURlP2P path]]) {
+                 NSLog(@"File Available");
+             }
+             else{
+                 NSLog(@"File not available");
+             }
+             
+             
+             if ([fileManager fileExistsAtPath:[VideoURLP2P path]]) {
+                 
+                 NSFileManager *fileManager = [NSFileManager defaultManager];
+                 [fileManager removeItemAtPath:[VideoURLP2P path]  error:NULL];
+                 
+             }
+             
+             [self performSelectorOnMainThread:@selector(showVideoSuccessMessage) withObject:nil waitUntilDone:NO];
+             
+         });
+     }
+     ];
+}
+
+
+
+#pragma mark- Timer Functionality Implementation
+
+- (NSTimer *)createTimer :(float)interval :(BOOL)shouldRepeat{
+    return [NSTimer scheduledTimerWithTimeInterval:interval
+                                            target:self
+                                          selector:@selector(timerTicked:)
+                                          userInfo:nil
+                                           repeats:shouldRepeat];
+}
+
+- (void)timerTicked:(NSTimer *)timer1 {
+    if (timer1==recordingTimer) {
+        currentTimeInSeconds++;
+        self.labelRecording.text = [self formattedTime:currentTimeInSeconds];
+        
+    }
+    
+    if (timer1== autometicStopTimer) {
+        
+        [self recordVideo:nil];
+        
+    }
+}
+
+- (NSString *)formattedTime:(int)totalSeconds
+{
+    
+    int seconds = totalSeconds % 60;
+    int minutes = (totalSeconds / 60) % 60;
+    
+    return [NSString stringWithFormat:@"%02d:%02d", minutes, seconds];
+}
+
+
+-(void)timeOutAlertMessagePopOut
+{
+    imgView.image = nil;
+    UIView *alertView = [[UIView alloc]initWithFrame:CGRectMake(20, 50, 250, 100)];
+    
+    alertView.center=CGPointMake(self.view.frame.size.width/2, self.view.frame.size.height/2+80);
+    alertView.backgroundColor=[UIColor clearColor];
+    
+    UIImageView*errorImage =[[UIImageView alloc]initWithImage:[UIImage imageNamed:@"error"]];
+    errorImage.frame=CGRectMake(0, 5, errorImage.frame.size.width, errorImage.frame.size.height);
+    errorImage.center=CGPointMake(alertView.frame.size.width/2, errorImage.center.y);
+    [alertView addSubview:errorImage];
+    
+    UILabel *errorLbl = [[UILabel alloc]initWithFrame:CGRectMake(10, errorImage.frame.origin.y+errorImage.frame.size.height/2, alertView.frame.size.width-20, 100)];
+    errorLbl.numberOfLines=0;
+    errorLbl.text=@"Connect Time Out, Please check if device is connected.";
+    errorLbl.textAlignment=NSTextAlignmentCenter;
+    errorLbl.font=[UIFont boldSystemFontOfSize:16];
+    errorLbl.textColor=[UIColor whiteColor];
+    [alertView addSubview:errorLbl];
+    
+    [self.view addSubview:alertView];
+    
+    
+    [UIView animateWithDuration:3 animations:^{
+        
+        alertView.frame = CGRectMake(alertView.frame.origin.x, alertView.frame.origin.y, 0, 0);
+        
+        alertView.alpha = 0;
+        
+    } completion:^(BOOL finished) {
+        
+        [alertView removeFromSuperview];
+        [self.navigationController popViewControllerAnimated:YES];
+        
+    }];
+
+}
+
+
+
+
+
 @end

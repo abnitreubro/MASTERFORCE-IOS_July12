@@ -8,7 +8,7 @@
 
 #import "PlaybackViewController.h"
 #import "obj_common.h"
-#import "IpCameraClientAppDelegate.h"
+#import "AppDelegate.h"
 #import "APICommon.h"
 #import <QuartzCore/QuartzCore.h>
 
@@ -37,6 +37,12 @@
         // Custom initialization
     }
     return self;
+}
+
+
+-(void)viewWillDisappear:(BOOL)animated
+{
+    [self StopPlayback];
 }
 
 - (BOOL) StartPlayback: (NSString*) filepath
@@ -70,7 +76,7 @@
     
     //NSLog(@"BBBBBBBBBBBBB");
     
-    IpCameraClientAppDelegate *ipCamDelegate = (IpCameraClientAppDelegate*)[[UIApplication sharedApplication] delegate];
+    AppDelegate *ipCamDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
     [ipCamDelegate switchBack];
     
     [m_playbackstoplock unlock];
@@ -137,7 +143,7 @@
     navigationBar.delegate = self;
     
     UIImage *image = [UIImage imageNamed:@"navbk.png"];
-    if (![IpCameraClientAppDelegate is43Version]) {
+    if (![AppDelegate is43Version]) {
         [self.navigationBar setBackgroundImage:image forBarMetrics:UIBarMetricsDefault];
     }
     self.navigationBar.alpha = 0.6f;
@@ -158,6 +164,8 @@
     [imageView addGestureRecognizer:imageGR];
     [imageGR release];
     
+    slider.continuous = YES;
+
     
     //load image
     self.imagePlayNormal = [UIImage imageNamed:@"video_play_pause_normal.png"];
@@ -230,24 +238,31 @@
     
     //=====================================================================
     
-    NSMutableArray *pathArray = [m_pRecPathMgt GetTotalPathArray:strDID date:strDate];
-    if (pathArray == nil) {
-        [self performSelectorOnMainThread:@selector(StopPlayback) withObject:nil waitUntilDone:NO];
-    }
-    
-    if (m_nSelectIndex >= [pathArray count]) {
-        [self performSelectorOnMainThread:@selector(StopPlayback) withObject:nil waitUntilDone:NO];
-    }
-    
-    //    for (NSString *path in pathArray) {
-    //        NSLog(@"path: %@", path);
-    //    }
-    
-    NSString *strRecFileName = [pathArray objectAtIndex:m_nSelectIndex];
+//    NSMutableArray *pathArray = [m_pRecPathMgt GetTotalPathArray:strDID date:strDate];
+//    if (pathArray == nil) {
+//        [self performSelectorOnMainThread:@selector(StopPlayback) withObject:nil waitUntilDone:NO];
+//    }
+//    
+//    if (m_nSelectIndex >= [pathArray count]) {
+//        [self performSelectorOnMainThread:@selector(StopPlayback) withObject:nil waitUntilDone:NO];
+//    }
+//    
+//    //    for (NSString *path in pathArray) {
+//    //        NSLog(@"path: %@", path);
+//    //    }
+//    
+//    NSString *strRecFileName = [pathArray objectAtIndex:m_nSelectIndex];
     //NSLog(@"strRecFileName: %@, m_nSelectIndex: %d", strRecFileName, m_nSelectIndex);
     
-    NSString *strRecPath = [self GetRecordPath:strRecFileName];
-    //NSLog(@"strRecPath: %@", strRecPath);
+//    NSString *strRecPath = [self GetRecordPath:strRecFileName];
+   
+    
+    
+    
+    NSString *strRecPath = _videoFilePath;
+
+    
+    NSLog(@"strRecPath: %@", strRecPath);
     
     if (![self StartPlayback:strRecPath]) {
         [self performSelectorOnMainThread:@selector(StopPlayback) withObject:nil waitUntilDone:NO];
@@ -258,8 +273,7 @@
     CGSize size = CGSizeMake(170,100);
     TimeStampLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,0,0,0)];
     [TimeStampLabel setNumberOfLines:0];
-    //font = [UIFont fontWithName:@"Arial" size:18];
-    //size = CGSizeMake(170,100);
+
     TimeStampLabel.lineBreakMode = UILineBreakModeWordWrap;
     NSString *s = @"2012-07-04 08:05:30";
     CGSize labelsize = [s sizeWithFont:font constrainedToSize:size lineBreakMode:UILineBreakModeWordWrap];
@@ -268,7 +282,6 @@
     TimeStampLabel.layer.masksToBounds = YES;
     TimeStampLabel.layer.cornerRadius = 2.0;
     TimeStampLabel.backgroundColor = osdColor;
-    //[self.view addSubview:TimeStampLabel];
     [TimeStampLabel setHidden:YES];
 }
 
@@ -323,6 +336,7 @@
     [self.view bringSubviewToFront:bottomView];
     [self.view bringSubviewToFront:TimeStampLabel];
 }
+
 
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -405,12 +419,18 @@
     
     [slider setMinimumValue:0];
     [slider setMaximumValue:[totalTime intValue]];
+    
+    [UIView animateWithDuration:[totalTime intValue] animations:^{
+        [slider setValue:[totalTime intValue] animated:YES];
+    }];
+    
 }
 
 - (void) updateCurrTime: (NSNumber*) currTime
 {
     startLabel.text = [self secTimeToString:[currTime intValue]];
-    [slider setValue:[currTime intValue]];
+    
+    
 }
 
 #pragma mark -
@@ -440,7 +460,7 @@
     // NSLog(@"timestamp:%d  timezone:%d",timestamp,timezone);
     
     
-    if (![IpCameraClientAppDelegate is43Version]) {
+    if (![AppDelegate is43Version]) {
         //NSLog(@"PlaybackData... length: %d, width: %d, height: %d", length, width, height);
         [self performSelectorOnMainThread:@selector(CreateGLView) withObject:nil waitUntilDone:NO];
         [myGLViewController WriteYUVFrame:yuv Len:length width:width height:height];
@@ -453,9 +473,6 @@
 
 - (void) PlaybackData:(UIImage *)image 
 {
-    //NSLog(@"PlaybackData");
-      
-    
     [self performSelectorOnMainThread:@selector(updateImage:) withObject:image waitUntilDone:NO];
 }
 

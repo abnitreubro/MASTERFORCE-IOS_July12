@@ -21,6 +21,7 @@
 - (BOOL) RemovePicPath: (NSString*)did PicDate: (NSString*)strDate PicPath: (NSString*)strPath ;
 - (BOOL) RemovePicPathByID : (NSString*) did ;
 
+
 - (NSMutableArray*) GetTotalPicDataArray: (NSString*) did;
 - (NSMutableArray*) GetTotalPathArray: (NSString*)did date:(NSString*)date;
 

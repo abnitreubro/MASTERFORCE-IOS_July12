@@ -8,12 +8,11 @@
 
 #import "CameraViewController.h"
 #import "CameraListCell.h"
-#import "IpCameraClientAppDelegate.h"
+#import "AppDelegate.h"
 #import <QuartzCore/QuartzCore.h>
 #import "PPPPDefine.h"
 #import "mytoast.h"
 #include "MyAudioSession.h"
-#import "SettingViewController.h"
 #import "AddCameraCell.h"
 
 
@@ -46,7 +45,7 @@
     //pPPPPChannelMgt->PPPPGetSDCardRecordFileList((char*)[strDID UTF8String], 0, 0);
     
     
-    IpCameraClientAppDelegate *IPCamDelegate =  [[UIApplication sharedApplication] delegate] ;   
+    AppDelegate *IPCamDelegate =  [[UIApplication sharedApplication] delegate] ;
     PlayViewController *playViewController = [[PlayViewController alloc] init];
     playViewController.m_pPPPPChannelMgt = pPPPPChannelMgt;
     playViewController.strDID = strDID;
@@ -197,11 +196,6 @@
         return;
     }
 
-    SettingViewController *settingView = [[SettingViewController alloc] init];
-    settingView.m_pPPPPChannelMgt = pPPPPChannelMgt;
-    settingView.m_strDID = [cameraDic objectForKey:@STR_DID];
-    [self.navigationController pushViewController:settingView animated:YES];
-    [settingView release];
 }
 
 -(NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath 

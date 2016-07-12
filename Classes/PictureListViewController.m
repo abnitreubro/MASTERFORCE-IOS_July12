@@ -18,7 +18,7 @@
 
 #import "PicListIpadCell.h"
 #import "mytoast.h"
-#import "IpCameraClientAppDelegate.h"
+#import "AppDelegate.h"
 @interface PictureListViewController ()
 
 @end
@@ -108,7 +108,7 @@
     
     [self initProgressView];
     
-    if ([IpCameraClientAppDelegate isIOS7Version]) {
+    if ([AppDelegate isIOS7Version]) {
         NSLog(@"is ios7");
        
         
@@ -418,9 +418,8 @@
         
         return (count % 9) > 0 ? (count / 9) + 1 : count / 9;
     }
-    
-    
 }
+
 
 - (UITableViewCell *)tableView:(UITableView *)aTableView cellForRowAtIndexPath:(NSIndexPath *)anIndexPath
 {
@@ -461,21 +460,23 @@
         //kaven
         UIImage *img=[m_myImgDic objectForKey:strPath];
         
+        
         NSString *flag=[m_myImgDic objectForKey:[NSString stringWithFormat:@"flagk%@",strPath]];
-        if (img==nil) {
+        if (img==nil)
+        {
             
             [m_myImgDic setObject:[NSString stringWithFormat:@"flag%@",strPath] forKey:[NSString stringWithFormat:@"flagk%@",strPath]];
+            
             NSDictionary *mdic=[NSDictionary dictionaryWithObjectsAndKeys:strPath,@"path",anIndexPath,@"indexpath",[NSNumber numberWithInt:1],@"num", nil];
+            
             [NSThread detachNewThreadSelector:@selector(startLoadLocalPic:) toTarget:self withObject:mdic];
         }
         //kaven
-        //UIImage *image = [APICommon GetImageByNameFromImage:strDID filename:strPath];
+
         
         if (img != nil) {
-            
             cell.imageView1.image = img;
         }else{
-            
             cell.imageView1.image=nil;
         }
         cell.imageView1.tag = AtIndex;
@@ -1147,6 +1148,9 @@
     // return nil;
     
 }
+
+
+
 -(void)startLoadLocalPic:(NSDictionary *)dic{
     usleep(10);
     [m_Lock lock];
@@ -1159,8 +1163,11 @@
     }
     [m_Lock unlock];
     // NSDictionary *mdic=[NSDictionary dictionaryWithObjectsAndKeys:indexPath,@"indexpath",path,@"path", nil];
-    
 }
+
+
+
+
 -(void)refreshCellForIndexPath:(NSDictionary *)dic{
     if (m_tableView==nil) {
         return;

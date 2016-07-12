@@ -16,8 +16,9 @@
     IBOutlet UISegmentedControl *segmentedControl;
     IBOutlet UITableView *m_tableView;
     
-    CameraListMgt *m_pCameraListMgt;
-    PicPathManagement *m_pPicPathMgt;
+    
+   // CameraListMgt *m_pCameraListMgt;
+    //PicPathManagement *m_pPicPathMgt;
     
     UIImage *imageBkDefault;
 }

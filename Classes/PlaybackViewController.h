@@ -60,6 +60,7 @@
 @property (nonatomic, retain) UIImage *imagePauseNormal;
 @property (nonatomic, retain) UIImage *imagePausePressed;
 
+@property (nonatomic,retain) NSString * videoFilePath;
 
 - (void) StopPlayback;
 

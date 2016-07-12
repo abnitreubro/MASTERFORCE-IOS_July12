@@ -13,5 +13,6 @@
 + (UIImage*) GetImageByName: (NSString*)did filename:(NSString*)filename;
 + (UIImage*) GetImageByNameFromImage: (NSString*)did filename:(NSString*)filename;
 + (UIImage*) YUV420ToImage: (Byte*)yuv width:(int)width height:(int)height;
++ (UIImage*) GetFirstImageFromRecordFile: (NSString*) strRecPath;
 
 @end

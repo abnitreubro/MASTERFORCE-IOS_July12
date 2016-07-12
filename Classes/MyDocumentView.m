@@ -10,7 +10,7 @@
 #import "PicDirCell.h"
 #import "obj_common.h"
 #import "APICommon.h"
-#import "IpCameraClientAppDelegate.h"
+#import "AppDelegate.h"
 #import "RecordDateViewController.h"
 #import "PictrueDateViewController.h"
 @interface MyDocumentView ()
@@ -75,13 +75,13 @@
     
     UIImage *image = [UIImage imageNamed:@"top_bg_blue.png"];
     
-    if (![IpCameraClientAppDelegate is43Version]) {
+    if (![AppDelegate is43Version]) {
         [self.navigationBar setBackgroundImage:image forBarMetrics:UIBarMetricsDefault];
     }
     //self.navigationBar.delegate = self;
     self.navigationBar.tintColor = [UIColor colorWithRed:BTN_NORMAL_RED/255.0f green:BTN_NORMAL_GREEN/255.0f blue:BTN_NORMAL_BLUE/255.0f alpha:1];
     
-    if ([IpCameraClientAppDelegate isIOS7Version]) {
+    if ([AppDelegate isIOS7Version]) {
         NSLog(@"is ios7");
         self.wantsFullScreenLayout = YES;
         [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
@@ -142,9 +142,6 @@
 }
 -(UITableViewCell*)tableView:(UITableView *)aTableView cellForRowAtIndexPath:(NSIndexPath *)anIndexPath{
     NSInteger index = anIndexPath.row ;
-//    NSDictionary *cameraDic = [m_pCameraListMgt GetCameraAtIndex:index];
-//    NSString *name = [cameraDic objectForKey:@STR_NAME];
-//    NSString *did = [cameraDic objectForKey:@STR_DID];
     
     NSString *cellIdentifier = @"CameraPictureListCell";
     PicDirCell *cell =  (PicDirCell*)[aTableView dequeueReusableCellWithIdentifier:cellIdentifier];
@@ -159,14 +156,8 @@
     switch (index) {
         case 0://picture
         {
-            
-            
             int nPicCount = [m_pPicPathMgt GetTotalNumByID:strDID];
             NSString *strShowName = [NSString stringWithFormat:@"%@(%d)", NSLocalizedStringFromTable(@"LocalPic", @STR_LOCALIZED_FILE_NAME, nil),nPicCount];
-            
-            //NSString *strPath = [m_pPicPathMgt GetFirstPathByID:strDID];
-            //UIImage *image = [APICommon GetImageByNameFromImage:strDID filename:strPath];
-            
             
             cell.labelName.text = strShowName;
             cell.imageView.image = [UIImage imageNamed:@"folder_picture.png"];
@@ -177,14 +168,7 @@
         {
             cell.labelName.text = [NSString stringWithFormat:@"%@(%d)", NSLocalizedStringFromTable(@"Record", @STR_LOCALIZED_FILE_NAME, nil), [m_pRecPathMgt GetTotalNumByID:strDID]];
             cell.imageView.image = [UIImage imageNamed:@"folder_video.png"];
-//            NSString *strFileName = [m_pRecPathMgt GetFirstPathByID:strDID];
-//            UIImage *image = [APICommon GetImageByName:strDID filename:strFileName];
-            
-//            if (image!=nil) {
-//                cell.imageView.image = image;
-//            }else{
-//                cell.imageView.image = defaultImg;
-//            }
+
         }
             break;
     }
@@ -230,7 +214,7 @@
 }
 #pragma mark Back Preview
 -(void)playPPPView{
-    IpCameraClientAppDelegate *ipClientAppDlg=[[UIApplication sharedApplication]delegate];
+    AppDelegate *ipClientAppDlg=[[UIApplication sharedApplication]delegate];
     PlayViewController *playViewController = [[PlayViewController alloc] init];
     playViewController.m_pPPPPChannelMgt=m_pPPPPChannelMgt;
     playViewController.strDID = strDID;

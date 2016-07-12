@@ -10,7 +10,7 @@
 #import "obj_common.h"
 #import "defineutility.h"
 #import "RemotePlaybackViewController.h"
-#import "IpCameraClientAppDelegate.h"
+#import "AppDelegate.h"
 #import "PhoneRecordViewController.h"
 #import "SearchFileViewController.h"
 #import "MyHeaderView.h"
@@ -109,7 +109,7 @@
     
     UIImage *image = [UIImage imageNamed:@"top_bg_blue.png"];
     
-    if (![IpCameraClientAppDelegate is43Version]) {
+    if (![AppDelegate is43Version]) {
         [self.navigationBar setBackgroundImage:image forBarMetrics:UIBarMetricsDefault];
     }
     self.navigationBar.delegate = self;
@@ -943,7 +943,7 @@
 }
 
 -(void)playPPPView{
-    IpCameraClientAppDelegate *ipClientAppDlg=[[UIApplication sharedApplication]delegate];
+    AppDelegate *ipClientAppDlg=[[UIApplication sharedApplication]delegate];
     PlayViewController *playViewController = [[PlayViewController alloc] init];
     playViewController.m_pPPPPChannelMgt=m_pPPPPChannelMgt;
     playViewController.strDID = m_strDID;

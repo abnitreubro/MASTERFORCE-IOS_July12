@@ -3,7 +3,7 @@
 #import "PictureShowViewController.h"
 #import "obj_common.h"
 #import "CustomToast.h"
-#import "IpCameraClientAppDelegate.h"
+#import "AppDelegate.h"
 @interface PictureShowViewController ()
 
 @end

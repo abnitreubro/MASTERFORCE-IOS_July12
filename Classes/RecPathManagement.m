@@ -96,6 +96,8 @@
     return [recPathDBUtil InsertPath:did Date:strDate Path:strPath];
     
 }
+
+
 -(NSDictionary *) GetSumAndFirstPicByID:(NSString *)strDID{
     int count=[self GetTotalNumByID:strDID];
     NSNumber *sum=[NSNumber numberWithInt:count];
@@ -202,6 +204,8 @@
 - (NSMutableArray*) GetTotalPathArray: (NSString*)did date:(NSString*)date
 {
     //NSLog(@"GetTotalPathArray did:%@, date: %@", did, date);
+    
+    return IDArray;
     
     NSMutableArray *dateArray = [self GetTotalDataArray:did];
     if (dateArray == nil) {

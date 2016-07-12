@@ -10,7 +10,7 @@
 #import "obj_common.h"
 #import "PicListCell.h"
 #import "PlaybackViewController.h"
-#import "IpCameraClientAppDelegate.h"
+#import "AppDelegate.h"
 #import "APICommon.h"
 #import <QuartzCore/QuartzCore.h>
 #import "SearchListCell.h"
@@ -295,7 +295,7 @@
     //self.navigationBar.alpha = 0.5f;
     
     CGRect tableViewFrame ;
-    if ([IpCameraClientAppDelegate isIOS7Version]) {
+    if ([AppDelegate isIOS7Version]) {
          tableViewFrame.size.height = 480 ;
     }else{
      tableViewFrame.size.height = 480-20 ;
@@ -319,7 +319,7 @@
     [self reloadPathArray];
     
     
-    if ([IpCameraClientAppDelegate isIOS7Version]) {
+    if ([AppDelegate isIOS7Version]) {
         NSLog(@"is ios7");
         
         
@@ -401,7 +401,7 @@
         playbackViewController.m_pRecPathMgt = m_pRecPathMgt;
         playbackViewController.strDID = strDID;
         playbackViewController.strDate = strDate;
-        IpCameraClientAppDelegate *IPCamDelegate = [[UIApplication sharedApplication] delegate];
+        AppDelegate *IPCamDelegate = [[UIApplication sharedApplication] delegate];
         [IPCamDelegate switchPlaybackView:playbackViewController];
         [playbackViewController release];
         return ;
@@ -565,7 +565,7 @@
     playbackViewController.m_pRecPathMgt = m_pRecPathMgt;
     playbackViewController.strDID = strDID;
     playbackViewController.strDate = strDate;
-    IpCameraClientAppDelegate *IPCamDelegate = [[UIApplication sharedApplication] delegate];
+    AppDelegate *IPCamDelegate = [[UIApplication sharedApplication] delegate];
     [IPCamDelegate switchPlaybackView:playbackViewController];
     [playbackViewController release];
 }

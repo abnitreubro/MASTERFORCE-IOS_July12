@@ -22,7 +22,7 @@
 #import "AppEnterForegroundProtocol.h"
 
 
-#import "LoginController.h"
+//#import "LoginController.h"
 #import "MyNavgationController.h"
 @interface IpCameraClientAppDelegate : NSObject <UIApplicationDelegate> {
     
@@ -42,13 +42,18 @@
     
     CPPPPChannelManagement *m_pPPPPChannelMgt ;
     
-    LoginController *loginController;
+  //  LoginController *loginController;
     
     id<AppEnterForegroundProtocol> appForegroudProtocol;
     
     MyNavgationController *myNavController;
     BOOL isEnterForeground;
 }
+
+@property (nonatomic, retain) UIStoryboard *appStoryboard;
+
+
+
 @property (nonatomic,retain)MyNavgationController *myNavController;
 @property (nonatomic, retain) UIWindow *window;
 @property (nonatomic, retain) UINavigationController *navigationController;
@@ -57,7 +62,7 @@
 @property (nonatomic, retain) PlaybackViewController *playbackViewController;
 @property (nonatomic, retain) RemotePlaybackViewController *remotePlaybackViewController;
 
-@property (nonatomic,retain) LoginController *loginController;
+//@property (nonatomic,retain) LoginController *loginController;
 
 
 @property (nonatomic,retain)id<AppEnterForegroundProtocol> appForegroudProtocol;

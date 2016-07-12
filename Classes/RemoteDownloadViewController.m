@@ -9,7 +9,7 @@
 #import "RemoteDownloadViewController.h"
 #define kHeaderViewTag 100
 
-#import "IpCameraClientAppDelegate.h"
+#import "AppDelegate.h"
 #import "MyHeaderView.h"
 #import <MediaPlayer/MediaPlayer.h>
 
@@ -106,7 +106,7 @@
     [m_CurAllDic removeAllObjects];
     [statusDic removeAllObjects];
     UIImage *image=[UIImage imageNamed:@"top_bg_blue.png"];
-    if (![IpCameraClientAppDelegate is43Version]) {
+    if (![AppDelegate is43Version]) {
         [self.navigationBar setBackgroundImage:image forBarMetrics:UIBarMetricsDefault];
         
     }

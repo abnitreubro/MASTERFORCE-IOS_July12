@@ -9,14 +9,10 @@
 #import "IpCameraClientAppDelegate.h"
 #import "obj_common.h"
 #import "CameraViewController.h"
-#import "MyTabBarViewController.h"
 #include <sys/param.h>
 #include <sys/mount.h>
-//#import "CameraAddViewController.h"
-#import "AboutViewController.h"
 
 #import "RemoteRecordFileListViewController.h"
-#import "UPlateViewController.h"
 
 #import "MyDocumentView.h"
 @implementation IpCameraClientAppDelegate
@@ -29,7 +25,7 @@
 @synthesize remotePlaybackViewController;
 
 @synthesize appForegroudProtocol;
-@synthesize loginController;
+//@synthesize loginController;
 
 @synthesize myNavController;
 #pragma mark -
@@ -58,10 +54,15 @@
 //    loginController.m_pCameraListMgt=m_pCameraListMgt;
 //    navigationController = [[UINavigationController alloc] initWithRootViewController:loginController];
 //   [navigationController setNavigationBarHidden:YES];
-   [self.window addSubview:startViewController.view];
-    self.window.rootViewController=startViewController;
-    [self.window makeKeyAndVisible];
-    [NSThread detachNewThreadSelector:@selector(StartThread:) toTarget:self withObject:nil];
+    
+    
+    self.appStoryboard = [UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]];
+
+    
+//    [self.window addSubview:startViewController.view];
+//    self.window.rootViewController=startViewController;
+//    [self.window makeKeyAndVisible];
+//    [NSThread detachNewThreadSelector:@selector(StartThread:) toTarget:self withObject:nil];
     return YES;
     
 }
@@ -73,10 +74,9 @@
          NSDictionary *fileSysAttributes = [fileManager attributesOfFileSystemForPath:path error:nil];
         NSNumber *freeSpace = [fileSysAttributes objectForKey:NSFileSystemFreeSize];
         NSNumber *totalSpace = [fileSysAttributes objectForKey:NSFileSystemSize];
-     //NSLog(@"已占用%0.1fG/剩余%0.1fG",([totalSpace longLongValue] - [freeSpace longLongValue])/1024.0/1024.0/1024.0,[freeSpace longLongValue]/1024.0/1024.0/1024.0);
+
      NSLog(@"剩余%0.0fM/总%0.0fM",[freeSpace longLongValue]/1024.0/1024.0,[totalSpace longLongValue]/1024.0/1024.0);
-        
-     }
+}
 
 
 
@@ -93,13 +93,6 @@
 {
     [self.startViewController.view removeFromSuperview];
     
-//    [[UIApplication sharedApplication] setStatusBarHidden:NO];
-//    [self.window addSubview:navigationController.view];
-   
-    //self.window.rootViewController=navigationController;
-    //self.window.rootViewController=myNavController;
-//    [self.window addSubview:loginController.view];
-    
     PlayViewController *playView = [[PlayViewController alloc] init];
     playView.m_pPPPPChannelMgt = m_pPPPPChannelMgt;
     playView.strDID = @"OBJ-002864-STBZD";//OBJ-002864-STBZD/OBJ-003816-JVTGK
@@ -113,13 +106,13 @@
 
 - (void) switchRemotePlaybackView: (RemotePlaybackViewController*)_remotePlaybackViewController;
 {
-    for (UIView *view in [self.window subviews]) {
+    for (UIView *view in [self.window subviews])
+    {
         [view removeFromSuperview];
     }
     
     self.remotePlaybackViewController = _remotePlaybackViewController ;
 
-    
     [[UIApplication sharedApplication] setStatusBarHidden:YES];
     [self.window addSubview:remotePlaybackViewController.view];
 }
@@ -190,17 +183,8 @@
     
     [self.window addSubview:navigationController.view];
     
-    if (type==100) {
-
-//        RemoteRecordFileListViewController *remoteFileView = [[RemoteRecordFileListViewController alloc] init];
-//        remoteFileView.m_pPPPPChannelMgt = m_pPPPPChannelMgt;
-//        remoteFileView.m_pPicPathMgt=m_pPicPathMgt;
-//        remoteFileView.m_strDID = did;
-//        
-//        [self.navigationController pushViewController:remoteFileView animated:YES];
-//        
-//        [remoteFileView release];
-        
+    if (type==100)
+    {
         MyDocumentView *documController=[[MyDocumentView alloc]init];
         documController.strDID=did;
         documController.strUser=user;
@@ -239,11 +223,6 @@
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
-    /*
-     Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later. 
-     If your application supports background execution, called instead of applicationWillTerminate: when the user quits.
-     */
-    //NSLog(@"applicationDidEnterBackground");
     
     if (playViewController != nil) {
         [playViewController StopPlay:1];
@@ -281,9 +260,6 @@
     [self switchPlayView:playView];
     [playView release];
     
-//    if (appForegroudProtocol!=nil) {
-//        [appForegroudProtocol appForegroundNotify];
-//    }
     return;
     [self.navigationController popToRootViewControllerAnimated:YES];
 }
@@ -327,7 +303,7 @@
     self.remotePlaybackViewController = nil;
     self.playbackViewController = nil;
     
-    self.loginController=nil;
+   // self.loginController=nil;
     if (cameraViewController != nil) {
         [cameraViewController release];
         cameraViewController = nil;

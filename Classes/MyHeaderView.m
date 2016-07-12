@@ -26,7 +26,8 @@
     }
     return self;
 }
--(void)dealloc{
+-(void)dealloc
+{
     [labelName release];
     [imgView release];
     [strName release];

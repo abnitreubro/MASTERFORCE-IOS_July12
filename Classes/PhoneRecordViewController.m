@@ -9,7 +9,7 @@
 #define STR_RECORD_FILE_SIZE "STR_RECORD_FILE_SIZE"
 #define kHeaderViewTag 100
 #import "PhoneRecordViewController.h"
-#import "IpCameraClientAppDelegate.h"
+#import "AppDelegate.h"
 #import "MyHeaderView.h"
 #import "SearchFileViewController.h"
 #import "obj_common.h"
@@ -104,7 +104,7 @@
     [m_CurAllDic removeAllObjects];
     [statusDic removeAllObjects];
     UIImage *image=[UIImage imageNamed:@"top_bg_blue.png"];
-    if (![IpCameraClientAppDelegate is43Version]) {
+    if (![AppDelegate is43Version]) {
         [self.navigationBar setBackgroundImage:image forBarMetrics:UIBarMetricsDefault];
         
     }
@@ -529,7 +529,7 @@
         //playbackViewController.localfilePath=localfilePath;
         //[self.navigationController pushViewController:playbackViewController animated:YES];
         
-        IpCameraClientAppDelegate *IPCamDelegate = [[UIApplication sharedApplication] delegate];
+        AppDelegate *IPCamDelegate = [[UIApplication sharedApplication] delegate];
         [IPCamDelegate switchPlaybackView:playbackViewController];
         
         [playbackViewController release];

@@ -7,7 +7,7 @@
 //
 
 #import "SearchFileViewController.h"
-#import "IpCameraClientAppDelegate.h"
+#import "AppDelegate.h"
 #import "obj_common.h"
 @interface SearchFileViewController ()
 
@@ -49,7 +49,7 @@
 {
     [super viewDidLoad];
     UIImage *image = [UIImage imageNamed:@"top_bg_blue.png"];
-    if (![IpCameraClientAppDelegate is43Version]) {
+    if (![AppDelegate is43Version]) {
         [navigationBar setBackgroundImage:image forBarMetrics:UIBarMetricsDefault];
     }
     self.navigationBar.delegate = self;

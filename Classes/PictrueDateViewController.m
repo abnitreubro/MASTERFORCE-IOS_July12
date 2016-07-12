@@ -11,7 +11,7 @@
 #import "PictureListViewController.h"
 #import "PicDirCell.h"
 #import "APICommon.h" 
-#import "IpCameraClientAppDelegate.h"
+#import "AppDelegate.h"
 @interface PictrueDateViewController ()
 
 @end
@@ -86,7 +86,7 @@
     self.imageBkDefault = [UIImage imageNamed:@"picbk.png"];
     
     
-    if ([IpCameraClientAppDelegate isIOS7Version]) {
+    if ([AppDelegate isIOS7Version]) {
         NSLog(@"is ios7");
         self.wantsFullScreenLayout = YES;
         [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
@@ -134,14 +134,12 @@
 
 - (NSInteger)tableView:(UITableView *)aTableView numberOfRowsInSection:(NSInteger)section
 {
-    //NSLog(@"numberOfRowsInSection11111");
     
     if (picDataArray == nil) {
         return 0;
     }
     
     return [picDataArray count];
-    
 }
 
 - (UITableViewCell *)tableView:(UITableView *)aTableView cellForRowAtIndexPath:(NSIndexPath *)anIndexPath
@@ -169,6 +167,7 @@
     
     cell.labelName.text = strShowName;
     cell.labelName.text = strShowName;
+    
     if (image != nil) {
         cell.imageView.image = image;
     }else {
@@ -210,13 +209,17 @@
     picListViewController.NotifyReloadDataDelegate=self;
     [self.navigationController pushViewController:picListViewController animated:YES];
     [picListViewController release];
-    
 }
+
+
+
 #pragma mark-
 #pragma mark perfortInMainThread
 -(void)reloadTableViewData{
     [self.tableView reloadData];
 }
+
+
 #pragma mark-
 #pragma mark NotifyReloadData
 -(void)NotifyReloadData{

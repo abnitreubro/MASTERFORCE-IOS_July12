@@ -162,6 +162,8 @@
 {
     //NSLog(@"GetTotalPicDataArray %@", did);
     
+    return IDArray;
+    
     for(NSDictionary *idDic in IDArray){
         NSMutableArray *_dateArray = [idDic objectForKey:did];
         if (_dateArray != nil) {
@@ -175,6 +177,8 @@
 - (NSMutableArray*) GetTotalPathArray: (NSString*)did date:(NSString*)date
 {
     //NSLog(@"GetTotalPathArray did:%@, date: %@", did, date);
+    
+    return IDArray;
     
     NSMutableArray *dateArray = [self GetTotalPicDataArray:did];
     if (dateArray == nil) {
@@ -211,7 +215,7 @@
         
         //删除
         [fileManager removeItemAtPath:fileName error:nil];
-
+        
     }
     @catch (NSException *exception) {
         return NO;
@@ -330,14 +334,10 @@
                 if (pathArray != nil) {
                     return [pathArray count];
                 }
-                
             }
-            
             return 0;
-            
         }
     }
-    
     return 0;
 }
 

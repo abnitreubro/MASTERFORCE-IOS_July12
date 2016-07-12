@@ -1,24 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="4514" systemVersion="12F45" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="8191" systemVersion="15A284" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none">
     <dependencies>
-        <deployment defaultVersion="1072" identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3746"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8154"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="PlayViewController">
             <connections>
                 <outlet property="LblProgress" destination="21" id="22"/>
                 <outlet property="btnGoStop" destination="146" id="174"/>
-                <outlet property="btnItemResolution" destination="169" id="172"/>
                 <outlet property="btnMemory" destination="165" id="168"/>
                 <outlet property="btnRecord" destination="80" id="187"/>
                 <outlet property="btnSnapshot" destination="77" id="188"/>
                 <outlet property="btnStatusPrompt" destination="193" id="195"/>
-                <outlet property="btnUpDown" destination="153" id="189"/>
-                <outlet property="imageDown" destination="141" id="142"/>
-                <outlet property="imageLeft" destination="139" id="143"/>
-                <outlet property="imageRight" destination="140" id="144"/>
-                <outlet property="imageUp" destination="138" id="145"/>
+                <outlet property="headerView" destination="7ez-S2-0ZC" id="iVs-Ng-SeR"/>
                 <outlet property="imgView" destination="3" id="57"/>
                 <outlet property="labelRecording" destination="190" id="191"/>
                 <outlet property="playToolBar" destination="73" id="98"/>
@@ -35,12 +30,14 @@
             <subviews>
                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" id="3">
                     <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                    <animations/>
                     <color key="backgroundColor" red="0.1048110651" green="0.1048110651" blue="0.1048110651" alpha="1" colorSpace="calibratedRGB"/>
                 </imageView>
                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="connecting..." textAlignment="center" lineBreakMode="tailTruncation" minimumFontSize="10" id="21">
                     <rect key="frame" x="33" y="226" width="255" height="28"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                    <animations/>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <color key="textColor" red="0.89949898100000003" green="0.89949898100000003" blue="0.89949898100000003" alpha="1" colorSpace="calibratedRGB"/>
                     <color key="highlightedColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -48,30 +45,37 @@
                 <activityIndicatorView opaque="NO" contentMode="scaleToFill" style="white" id="26">
                     <rect key="frame" x="149" y="199" width="20" height="20"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                    <animations/>
                 </activityIndicatorView>
                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" id="66">
                     <rect key="frame" x="107" y="408" width="201" height="21"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                    <animations/>
                     <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                     <color key="textColor" red="0.95998216709999995" green="0.36283269620000003" blue="0.097984713929999995" alpha="1" colorSpace="calibratedRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <toolbar opaque="NO" clearsContextBeforeDrawing="NO" alpha="0.69999998807907104" contentMode="scaleToFill" id="71">
-                    <rect key="frame" x="0.0" y="0.0" width="480" height="44"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
+                <toolbar hidden="YES" opaque="NO" clearsContextBeforeDrawing="NO" userInteractionEnabled="NO" alpha="0.69999998807907104" contentMode="scaleToFill" id="71">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                    <animations/>
                     <items>
+                        <barButtonItem title="Back" width="42" style="done" id="8qA-km-NJU"/>
+                        <barButtonItem width="5" style="plain" systemItem="fixedSpace" id="Qlk-Tw-oK4"/>
                         <barButtonItem width="100" id="165"/>
                         <barButtonItem title="Item" id="193">
                             <connections>
                                 <action selector="btnStartPPPP:" destination="-1" id="197"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem style="plain" systemItem="flexibleSpace" id="186"/>
                     </items>
+                    <color key="barTintColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                 </toolbar>
-                <toolbar opaque="NO" clearsContextBeforeDrawing="NO" alpha="0.69999998807907104" contentMode="scaleToFill" id="73">
+                <toolbar opaque="NO" clearsContextBeforeDrawing="NO" alpha="0.69999999999999996" contentMode="scaleToFill" translucent="NO" id="73">
                     <rect key="frame" x="-1" y="436" width="320" height="44"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                    <animations/>
+                    <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                     <items>
                         <barButtonItem image="play_start.png" id="146">
                             <connections>
@@ -79,67 +83,66 @@
                             </connections>
                         </barButtonItem>
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="177"/>
-                        <barButtonItem image="takepic.png" id="77">
+                        <barButtonItem systemItem="camera" id="77">
                             <connections>
                                 <action selector="btnSnapshot:" destination="-1" id="175"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="178"/>
-                        <barButtonItem image="play_recordvideo.png" id="80">
+                        <barButtonItem image="CameraRecord_Start.png" id="80">
                             <connections>
                                 <action selector="btnRecord:" destination="-1" id="176"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem style="plain" systemItem="flexibleSpace" id="179"/>
-                        <barButtonItem image="play_folder.png" id="153">
-                            <connections>
-                                <action selector="btnUpDown:" destination="-1" id="184"/>
-                            </connections>
-                        </barButtonItem>
-                        <barButtonItem style="plain" systemItem="flexibleSpace" id="180"/>
-                        <barButtonItem image="play_setting.png" id="169">
-                            <connections>
-                                <action selector="btnItemResolutionPressed:" destination="-1" id="171"/>
-                            </connections>
-                        </barButtonItem>
                     </items>
+                    <color key="tintColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                    <color key="barTintColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                 </toolbar>
-                <imageView userInteractionEnabled="NO" alpha="0.69999998807907104" contentMode="scaleToFill" image="up.png" id="138">
-                    <rect key="frame" x="127" y="121" width="65" height="55"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                </imageView>
-                <imageView userInteractionEnabled="NO" alpha="0.69999998807907104" contentMode="scaleToFill" image="left.png" id="139">
-                    <rect key="frame" x="20" y="208" width="55" height="65"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                </imageView>
-                <imageView userInteractionEnabled="NO" alpha="0.69999998807907104" contentMode="scaleToFill" image="right.png" id="140">
-                    <rect key="frame" x="213" y="189" width="55" height="65"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                </imageView>
-                <imageView userInteractionEnabled="NO" alpha="0.69999998807907104" contentMode="scaleToFill" image="down.png" id="141">
-                    <rect key="frame" x="134" y="313" width="65" height="55"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                </imageView>
                 <label hidden="YES" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="190">
                     <rect key="frame" x="128" y="59" width="172" height="21"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                    <animations/>
                     <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                    <color key="textColor" red="0.95998216709999995" green="0.36283269620000003" blue="0.097984713929999995" alpha="1" colorSpace="calibratedRGB"/>
+                    <color key="textColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
+                <view alpha="0.69999999999999996" contentMode="scaleToFill" id="7ez-S2-0ZC">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="cPM-zG-Jtz">
+                            <rect key="frame" x="5" y="19" width="45" height="30"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <animations/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <state key="normal" title="Back">
+                                <color key="titleColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="backButtonAction:" destination="-1" eventType="touchUpInside" id="BXM-3G-4Q6"/>
+                            </connections>
+                        </button>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="MX1020 Masterforce Wi-Fi Inspection Camera/Video" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="oXx-0d-hXb">
+                            <rect key="frame" x="45" y="23" width="230" height="21"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES"/>
+                            <animations/>
+                            <fontDescription key="fontDescription" type="system" weight="medium" pointSize="15"/>
+                            <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <animations/>
+                    <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                </view>
             </subviews>
+            <animations/>
             <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
         </view>
     </objects>
     <resources>
-        <image name="down.png" width="96" height="96"/>
-        <image name="left.png" width="96" height="96"/>
-        <image name="play_folder.png" width="20" height="20"/>
-        <image name="play_recordvideo.png" width="24" height="24"/>
-        <image name="play_setting.png" width="20" height="20"/>
+        <image name="CameraRecord_Start.png" width="33" height="22"/>
         <image name="play_start.png" width="20" height="20"/>
-        <image name="right.png" width="96" height="96"/>
-        <image name="takepic.png" width="20" height="20"/>
-        <image name="up.png" width="96" height="96"/>
     </resources>
 </document>

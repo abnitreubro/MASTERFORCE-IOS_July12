@@ -166,7 +166,6 @@
             [m_Lock unlock];
             return i;
         }
-        
     }
 
     [m_Lock unlock];

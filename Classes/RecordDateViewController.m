@@ -12,7 +12,7 @@
 #import "PicDirCell.h"
 #import "defineutility.h"
 #import "APICommon.h"
-#import "IpCameraClientAppDelegate.h"
+#import "AppDelegate.h"
 @interface RecordDateViewController ()
 
 @end
@@ -89,7 +89,7 @@
     
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     
-    if ([IpCameraClientAppDelegate isIOS7Version]) {
+    if ([AppDelegate isIOS7Version]) {
         NSLog(@"is ios7");
         self.wantsFullScreenLayout = YES;
         [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];

@@ -8,7 +8,7 @@
 
 #import "RemotePlaybackViewController.h"
 #import "obj_common.h"
-#import "IpCameraClientAppDelegate.h"
+#import "AppDelegate.h"
 
 @interface RemotePlaybackViewController ()
 
@@ -43,7 +43,7 @@
     m_pPPPPMgnt->PPPPStopPlayback((char*)[strDID UTF8String]);
     m_pPPPPMgnt->SetPlaybackDelegate((char*)[strDID UTF8String], nil);
     
-    IpCameraClientAppDelegate *IPCamDelegate = (IpCameraClientAppDelegate*)[[UIApplication sharedApplication] delegate];
+    AppDelegate *IPCamDelegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
     [IPCamDelegate switchBack];
     
     [m_playbackstoplock unlock];
@@ -217,7 +217,7 @@
 - (void) updateImage: (UIImage*) image
 {
     imageView.image = image;
-    // [image release];
+     [image release];
 }
 
 - (void) hideView

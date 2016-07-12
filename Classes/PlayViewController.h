@@ -19,7 +19,22 @@
 
 #import "RunCarModeProtocol.h"
 #import "MySetDialog.h"
-@interface PlayViewController : UIViewController <UINavigationBarDelegate, PPPPStatusProtocol, ParamNotifyProtocol,ImageNotifyProtocol,RunCarModeProtocol,MySetDialogDelegate>
+
+
+
+
+// new
+
+#import <MobileCoreServices/MobileCoreServices.h>
+#import <AVFoundation/AVFoundation.h>
+#import <AVKit/AVKit.h>
+#import <AssetsLibrary/AssetsLibrary.h>
+
+
+
+
+
+@interface PlayViewController : UIViewController <UINavigationBarDelegate, PPPPStatusProtocol, ParamNotifyProtocol,ImageNotifyProtocol,RunCarModeProtocol,MySetDialogDelegate,AVAudioRecorderDelegate>
 {    
     IBOutlet UIImageView *imgView;
     IBOutlet UIActivityIndicatorView *progressView;
@@ -163,7 +178,41 @@
     
     BOOL isIOS7;
     int takepicNum;
+    
+    
+    
+    //// new
+    BOOL isRecording,isProcessing;
+    
+    AVPlayer * liveVideoPlayer;
+    
+    AVPlayerItem *playerItem;
+    
+    NSMutableArray *numberOfScreenshots;
+    
+    CFAbsoluteTime      _timeOfFirstFrame;
+    NSTimer*recordingTimerVideo;
+
+    NSDate* startedAt;
+
+    AVAudioRecorder *recorder;
+    
+    NSTimer*waitingTimer,*recordingTimer,*autometicStopTimer;
+    int currentTimeInSeconds;
+
+
+    IBOutlet UIView *headerView;
+    
+    NSMutableArray * tempDetailsArray, *p2pPathDetails;
+    NSString * audioOrVideo;
+    
+    
 }
+
+@property (nonatomic,strong)NSString * savedImagePathTemp;
+
+@property (nonatomic,strong)NSURL *AudioURlP2P, *VideoURLP2P;
+
 @property (nonatomic,retain)UIView  *portraitView;
 @property (nonatomic,retain) IBOutlet UILabel *labelRecording;
 @property (nonatomic,copy)NSString *strMemory;
@@ -238,4 +287,7 @@
 
 - (IBAction) btnGoStop:(id)sender;
 - (IBAction) btnStartPPPP:(id)sender;
+
+#pragma mark- JS Products Method
+- (IBAction)backButtonAction:(id)sender;
 @end
